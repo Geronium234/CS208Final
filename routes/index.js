@@ -1,15 +1,42 @@
 var express = require('express');
 var router = express.Router();
 
+var COMMENTS_PER_PAGE = 10;
+
 /* GET home page. */
 router.get('/', function(req, res, next){
   try {
-    req.db.query('SELECT * FROM todos;', (err, results) => {
+    var parsedPage = parseInt(req.query.page, 10);
+    var currentPage = Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+    var offset = (currentPage - 1) * COMMENTS_PER_PAGE;
+
+    req.db.query('SELECT COUNT(*) AS total FROM todos;', (countErr, countResults) => {
+      if (countErr) {
+        console.error('Error counting todos:', countErr);
+        return res.status(500).send('Error fetching todos');
+      }
+
+      var totalComments = countResults[0].total;
+      var totalPages = Math.max(1, Math.ceil(totalComments / COMMENTS_PER_PAGE));
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+        offset = (currentPage - 1) * COMMENTS_PER_PAGE;
+      }
+
+      req.db.query('SELECT * FROM todos ORDER BY id DESC LIMIT ? OFFSET ?;', [COMMENTS_PER_PAGE, offset], (err, results) => {
       if (err) {
         console.error('Error fetching todos:', err);
         return res.status(500).send('Error fetching todos');
       }
-      res.render('index', { title: 'My Simple TODO', todos: results });
+      res.render('comments', {
+        title: 'Downtown Donuts',
+        todos: results,
+        currentPage: currentPage,
+        totalPages: totalPages,
+        hasPrevPage: currentPage > 1,
+        hasNextPage: currentPage < totalPages
+      });
+      });
     });
   } catch (error) {
     console.error('Error fetching items:', error);

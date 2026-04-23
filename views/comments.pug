@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title} feel free to add your own comments and see what other people have to say about our delicious donuts!
+  ol
+  each val in todos
+    li
+      span= val.task + ' - '
+      if val.completed > 0
+        span Completed
+      else
+        span Not Completed
+      form(method='POST' action='/delete')
+        input(type='hidden', name='id', value=val.id)
+        button(type='submit') Delete
+
+  if totalPages > 1
+    nav
+      if hasPrevPage
+        a(href='/?page=' + (currentPage - 1)) Previous
+      span(style='margin: 0 12px;') Page #{currentPage} of #{totalPages}
+      if hasNextPage
+        a(href='/?page=' + (currentPage + 1)) Next
+
+  hr
+  h2 Add a new comment
+  form(method='POST' action='/create')
+    label(for='task') Comment:
+    input(type='text', name='task', id='task', required)
+    button(type='submit') Create Comment
