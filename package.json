@@ -3,13 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "start:codespace": "bash ./setup_scripts/startup_codespace.sh"
   },
   "dependencies": {
     "express": "^5.1.0",
     "http-errors": "2.0.0",
     "mysql2": "^3.14.2",
-    "pug": "3.0.3"
+    "npm": "^11.13.0",
+    "pug": "3.0.3",
+    "start": "^5.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

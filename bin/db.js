@@ -17,6 +17,14 @@ function createDbConnection() {
                 console.error('Error connecting to database:', err);
                 // Handle error appropriately, e.g., exit process
             } else {
+                connection.query(
+                    'ALTER TABLE todos ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;',
+                    migrationErr => {
+                        if (migrationErr) {
+                            console.error('Error ensuring created_at column exists:', migrationErr);
+                        }
+                    }
+                );
                 console.log('Database connected!');
             }
         });

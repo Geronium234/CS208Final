@@ -23,7 +23,7 @@ router.get('/', function(req, res, next){
         offset = (currentPage - 1) * COMMENTS_PER_PAGE;
       }
 
-      req.db.query('SELECT * FROM todos ORDER BY id DESC LIMIT ? OFFSET ?;', [COMMENTS_PER_PAGE, offset], (err, results) => {
+      req.db.query("SELECT id, task, completed, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') AS posted_at FROM todos ORDER BY id DESC LIMIT ? OFFSET ?;", [COMMENTS_PER_PAGE, offset], (err, results) => {
       if (err) {
         console.error('Error fetching todos:', err);
         return res.status(500).send('Error fetching todos');

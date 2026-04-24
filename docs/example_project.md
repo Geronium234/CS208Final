@@ -87,6 +87,18 @@ npm install
 npm start
 ```
 
+For daily use in Codespaces (especially after a restart), run:
+
+```bash
+npm run start:codespace
+```
+
+This command does three things before launching the app:
+
+- Stops any old process still using port 3000.
+- Starts MariaDB if it is not running.
+- Starts the Node.js server.
+
 # Troubleshooting
 
 ## Database User and Password
