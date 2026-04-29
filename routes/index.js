@@ -52,6 +52,13 @@ router.get('/menu', function(req, res, next){
   });
 });
 
+/* GET about page. */
+router.get('/about', function(req, res, next){
+  res.render('about', {
+    title: 'About Us'
+  });
+});
+
 /* GET comments page. */
 router.get('/comments', function(req, res, next){
   try {
