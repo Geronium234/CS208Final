@@ -3,6 +3,12 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}. Feel free to add your own comments and see what other people have to say about our delicious donuts!
+  
+  if errorMessage
+    div(style='color: red; padding: 10px; background-color: #ffe6e6; margin-bottom: 20px; border-radius: 4px;')
+      strong Error: 
+      span= errorMessage
+  
   ol
   each val in todos
     li
@@ -21,7 +27,25 @@ block content
 
   hr
   h2 Add a new comment
-  form(method='POST' action='/create')
+  form(method='POST' action='/create' id='commentForm')
     label(for='task') Comment:
-    input(type='text', name='task', id='task', required)
-    button(type='submit') Create Comment
+    input(type='text', name='task', id='task', required, maxlength='1000')
+    span(id='charCount' style='display: block; font-size: 0.9em; color: #666; margin-top: 5px;') 0 / 1000 characters
+    button(type='submit' id='submitBtn') Create Comment
+
+  script.
+    const taskInput = document.getElementById('task');
+    const charCount = document.getElementById('charCount');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('commentForm');
+    
+    // Update character count as user types
+    taskInput.addEventListener('input', function() {
+      charCount.textContent = this.value.length + ' / 1000 characters';
+    });
+    
+    // Prevent double-submit by disabling button after click
+    form.addEventListener('submit', function() {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+    });

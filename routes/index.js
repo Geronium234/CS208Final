@@ -72,12 +72,50 @@ router.get('/comments', function(req, res, next){
 });
 
 router.post('/create', function (req, res, next) {
-    const { task } = req.body;
+    let { task } = req.body;
+    
+    // Trim whitespace from input
+    task = task ? task.trim() : '';
+    
+    // Check for empty or whitespace-only input
+    if (!task) {
+      return res.status(400).render('comments', {
+        title: 'Downtown Donuts',
+        todos: [],
+        currentPage: 1,
+        totalPages: 1,
+        hasPrevPage: false,
+        hasNextPage: false,
+        errorMessage: 'Please enter a comment with actual text.'
+      });
+    }
+    
+    // Check for extremely long input (limit to 1000 characters)
+    if (task.length > 1000) {
+      return res.status(400).render('comments', {
+        title: 'Downtown Donuts',
+        todos: [],
+        currentPage: 1,
+        totalPages: 1,
+        hasPrevPage: false,
+        hasNextPage: false,
+        errorMessage: 'Comment is too long. Please keep it under 1000 characters.'
+      });
+    }
+    
     try {
       req.db.query('INSERT INTO todos (task) VALUES (?);', [task], (err, results) => {
         if (err) {
           console.error('Error adding todo:', err);
-          return res.status(500).send('Error adding todo');
+          return res.status(500).render('comments', {
+            title: 'Downtown Donuts',
+            todos: [],
+            currentPage: 1,
+            totalPages: 1,
+            hasPrevPage: false,
+            hasNextPage: false,
+            errorMessage: 'Sorry, we could not add your comment. Please try again later.'
+          });
         }
         console.log('Todo added successfully:', results);
         // Redirect to the comments page after adding
@@ -85,7 +123,15 @@ router.post('/create', function (req, res, next) {
       });
     } catch (error) {
       console.error('Error adding todo:', error);
-      res.status(500).send('Error adding todo');
+      return res.status(500).render('comments', {
+        title: 'Downtown Donuts',
+        todos: [],
+        currentPage: 1,
+        totalPages: 1,
+        hasPrevPage: false,
+        hasNextPage: false,
+        errorMessage: 'Sorry, we could not add your comment. Please try again later.'
+      });
     }
 });
 
@@ -95,15 +141,31 @@ router.post('/delete', function (req, res, next) {
       req.db.query('DELETE FROM todos WHERE id = ?;', [id], (err, results) => {
         if (err) {
           console.error('Error deleting todo:', err);
-          return res.status(500).send('Error deleting todo');
+          return res.status(500).render('comments', {
+            title: 'Downtown Donuts',
+            todos: [],
+            currentPage: 1,
+            totalPages: 1,
+            hasPrevPage: false,
+            hasNextPage: false,
+            errorMessage: 'Sorry, we could not delete that comment. Please try again.'
+          });
         }
         console.log('Todo deleted successfully:', results);
         // Redirect to the comments page after deletion
         res.redirect('/comments');
-    });
-    }catch (error) {
-        console.error('Error deleting todo:', error);
-        res.status(500).send('Error deleting todo:');
+      });
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+      return res.status(500).render('comments', {
+        title: 'Downtown Donuts',
+        todos: [],
+        currentPage: 1,
+        totalPages: 1,
+        hasPrevPage: false,
+        hasNextPage: false,
+        errorMessage: 'Sorry, we could not delete that comment. Please try again.'
+      });
     }
 });
 
